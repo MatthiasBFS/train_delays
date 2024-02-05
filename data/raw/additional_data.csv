@@ -1,0 +1,43 @@
+start;end;city;event;detail
+21.12.2020;01.01.2021;Zurich;school holidays;christmas holidays
+15.02.2021;26.02.2021;Zurich;school holidays;winter holidays
+13.12.2020;11.12.2021;;timetable 2021;
+12.12.2021;10.12.2022;;timetable 2022;
+11.12.2022;09.12.2023;;timetable 2023;
+10.12.2023;14.12.2024;;timetable 2024;
+26.04.2021;07.05.2021;Zurich;school holidays;spring holidays
+19.07.2021;23.08.2021;Zurich;school holidays;summer holidays
+11.10.2021;22.10.2021;Zurich;school holidays;fall holidays
+20.12.2021;31.12.2021;Zurich;school holidays;christmas holidays
+14.02.2022;25.02.2022;Zurich;school holidays;winter holidays
+18.04.2022;29.04.2022;Zurich;school holidays;spring holidays
+18.07.2022;22.08.2022;Zurich;school holidays;summer holidays
+10.10.2022;21.10.2022;Zurich;school holidays;fall holidays
+26.10.2022;06.01.2022;Zurich;school holidays;christmas holidays
+13.02.2023;24.02.2023;Zurich;school holidays;winter holidays
+24.04.2023;05.05.2023;Zurich;school holidays;spring holidays
+17.07.2023;21.08.2023;Zurich;school holidays;summer holidays
+09.10.2023;20.10.2023;Zurich;school holidays;fall holidays
+25.12.2023;05.01.2024;Zurich;school holidays;christmas holidays
+12.02.2023;23.02.2024;Zurich;school holidays;winter holidays
+17.09.2022;03.10.2022;Munich;oktoberfest;
+16.09.2023;03.10.2023;Munich;oktoberfest;
+23.12.2020;09.01.2021;Munich;school holidays;christmas holidays
+29.03.2021;10.04.2021;Munich;school holidays;easter holidays
+25.05.2021;04.06.2021;Munich;school holidays;pentcost holidays
+30.07.2021;13.09.2021;Munich;school holidays;summer holidays
+02.11.2021;05.11.2021;Munich;school holidays;fall holidays
+24.12.2021;08.01.2022;Munich;school holidays;christmas holidays
+28.02.2022;04.03.2022;Munich;school holidays;winter holidays
+11.04.2022;23.04.2022;Munich;school holidays;easter holidays
+07.06.2022;18.06.2022;Munich;school holidays;pentcost holidays
+01.08.2022;12.09.2022;Munich;school holidays;summer holidays
+31.10.2022;04.11.2022;Munich;school holidays;fall holidays
+24.12.2022;07.07.2023;Munich;school holidays;christmas holidays
+20.02.2023;24.02.2023;Munich;school holidays;winter holidays
+03.04.2023;15.04.2023;Munich;school holidays;easter holidays
+30.05.2023;09.06.2023;Munich;school holidays;pentcost holidays
+31.07.2023;11.09.2023;Munich;school holidays;summer holidays
+30.10.2023;03.11.2023;Munich;school holidays;fall holidays
+23.12.2023;05.01.2024;Munich;school holidays;christmas holidays
+12.02.2023;16.02.2024;Munich;school holidays;winter holidays
