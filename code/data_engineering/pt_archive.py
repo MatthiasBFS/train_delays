@@ -36,7 +36,7 @@ def get_df_link():
 def get_data(list_link):
 
     dtype={"LINIEN_ID": "string", "LINIEN_TEXT": "string", "UMLAUF_ID":"string", "HALTESTELLEN_NAME": "string"}
-    train_list=["96","98","190","192","194", "196", "198"]
+    train_list=["96","98","190","192","194", "196", "198","10096","10098","10190","10192","10194", "10196", "10198"]
     df_list=[]
 
     for url in list_link:
