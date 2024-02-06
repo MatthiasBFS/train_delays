@@ -45,7 +45,8 @@ plot(df%>%group_by(yearmon)%>%summarise(count=n()),type="l")
 
 
 ### Average delay per period
-plot(df%>%group_by(BETRIEBSTAG)%>%summarise(avg_delay=mean(delay, na.rm=TRUE)), type="l")
+avg_delay<-df%>%group_by(BETRIEBSTAG)%>%summarise(avg_delay=mean(delay, na.rm=TRUE), count_trains=n(), cancelled=sum(FAELLT_AUS_TF))
+plot(avg_delay$BETRIEBSTAG,avg_delay$avg_delay, type="l")
 
 
 plot(df%>%group_by(yearmon)%>%summarise(count=n()), type="l", ylim=c(0,255))
