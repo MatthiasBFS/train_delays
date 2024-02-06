@@ -21,6 +21,7 @@ df$trainNr<-if_else(df$LINIEN_ID>10000, df$LINIEN_ID-10000, df$LINIEN_ID)
 high_train_nr<-df%>%group_by(HALTESTELLEN_NAME, BETRIEBSTAG, trainNr)%>%summarise(count=n())
 df<-left_join(df, high_train_nr)
 df<-df%>%filter(!(LINIEN_ID<10000 & count>1))%>%select(-"LINIEN_ID")
+df$trainNr<-as.factor(df$trainNr)
 
 
 #### 1.Create New Variables & Filter ####
@@ -52,21 +53,17 @@ plot(df%>%group_by(yearmon)%>%summarise(count=n()),type="l")
 
 
 ### Average delay per period
-avg_delay<-df%>%group_by(BETRIEBSTAG)%>%summarise(avg_delay=mean(delay, na.rm=TRUE), count_trains=n(), cancelled=sum(FAELLT_AUS_TF))
-
-df_daily_avg<-left_join(days_sequ,
-          avg_delay,
-          by=c("day"="BETRIEBSTAG"))%>%
-  mutate(wday=wday(day, label = TRUE))
-
 plot(avg_delay$BETRIEBSTAG,avg_delay$avg_delay, type="l")
 
 
 plot(df%>%group_by(yearmon)%>%summarise(count=n()), type="l", ylim=c(0,255))
 lines(df%>%filter(FAELLT_AUS_TF==TRUE)%>%group_by(yearmon)%>%summarise(cancelled=n()), col="red")
 
-df%>%group_by(yearmon, trainNr)%>%summarise(count=n())%>%ggplot()+
-  geom_point(aes(x=yearmon, y=count, group=as.character(trainNr),  color=as.character(trainNr)), position=position_jitter(h=0.15,w=0.15))
+df%>%
+  group_by(yearmon, trainNr)%>%
+  summarise(count=n())%>%
+  ggplot(aes(x=yearmon, y=count, group=trainNr,  color=trainNr))+
+  geom_point(position=position_jitter(h=0.15,w=0.15))
 
 cancelled_daily<-left_join(days_sequ,
                            df%>%filter(FAELLT_AUS_TF==TRUE)%>%group_by(BETRIEBSTAG)%>%summarise(cancelled=n()), 
@@ -76,6 +73,12 @@ cancelled_daily<-left_join(days_sequ,
 plot(cancelled_daily,ylim=c(0,7),type="l")
 lines(df%>%group_by(BETRIEBSTAG)%>%summarise(count=n()), type="l", col="red")
 
+df%>%ggplot(aes(x=BETRIEBSTAG, y=delay, group=trainNr, color=trainNr))+
+  geom_point(aes(alpha=0.01))
 
-plot(df%>%filter(FAELLT_AUS_TF==TRUE)%>%group_by(yearmon)%>%summarise(cancelled=n()))
+df%>%group_by(yearmon, trainNr)%>%summarise(avg_delay=mean(delay, na.rm = TRUE))%>%
+  ggplot(aes(x=yearmon, y=avg_delay, group=trainNr, color=trainNr))+
+  geom_line()+
+  geom_point()
 
+t<-df%>%group_by(yearmon, trainNr)%>%summarise(avg_delay=mean(delay))
