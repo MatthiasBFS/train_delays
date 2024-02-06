@@ -36,8 +36,15 @@ days_data<-data.frame(day=unique(df$BETRIEBSTAG))
 days_sequ<-data.frame(day=seq(min(df$BETRIEBSTAG), max(df$BETRIEBSTAG), "days"))
 setdiff(days_sequ, days_data)
 
+#### 3.Create Final Dataset ####
+avg_delay<-df%>%group_by(BETRIEBSTAG)%>%summarise(avg_delay=mean(delay, na.rm=TRUE), count_trains=n(), cancelled=sum(FAELLT_AUS_TF))
+df_daily_avg<-left_join(days_sequ,
+                        avg_delay,
+                        by=c("day"="BETRIEBSTAG"))%>%
+  mutate(wday=wday(day, label = TRUE))
 
-#### 3.Explanatory Analysis ####
+
+#### 4.Explanatory Analysis ####
 
 ### How many trains are running per period?
 df%>%group_by(yearmon)%>%summarise(count=n())
@@ -46,6 +53,12 @@ plot(df%>%group_by(yearmon)%>%summarise(count=n()),type="l")
 
 ### Average delay per period
 avg_delay<-df%>%group_by(BETRIEBSTAG)%>%summarise(avg_delay=mean(delay, na.rm=TRUE), count_trains=n(), cancelled=sum(FAELLT_AUS_TF))
+
+df_daily_avg<-left_join(days_sequ,
+          avg_delay,
+          by=c("day"="BETRIEBSTAG"))%>%
+  mutate(wday=wday(day, label = TRUE))
+
 plot(avg_delay$BETRIEBSTAG,avg_delay$avg_delay, type="l")
 
 
