@@ -2,7 +2,7 @@ library("tidyverse")
 library("lubridate")
 library("zoo")
 
-df<-read_csv("train_delays/data/raw/pt_results.csv")
+df<-read_csv("~/train_delays/data/raw/pt_results.csv")
 
 #### 0.Type Conversions and Wrong Encoding ####
 df$HALTESTELLEN_NAME<-gsub("Ã¼", "ü", df$HALTESTELLEN_NAME)
@@ -63,7 +63,9 @@ df%>%
   group_by(yearmon, trainNr)%>%
   summarise(count=n())%>%
   ggplot(aes(x=yearmon, y=count, group=trainNr,  color=trainNr))+
-  geom_point(position=position_jitter(h=0.15,w=0.15))
+  # geom_point(position=position_jitter(h=0.15,w=0.15))+
+  geom_line()+
+  geom_point()
 
 cancelled_daily<-left_join(days_sequ,
                            df%>%filter(FAELLT_AUS_TF==TRUE)%>%group_by(BETRIEBSTAG)%>%summarise(cancelled=n()), 
