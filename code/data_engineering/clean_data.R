@@ -29,6 +29,7 @@ df$delay<-as.numeric(df$AN_PROGNOSE-df$ANKUNFTSZEIT)/60
 df$yearmon<-as.yearmon(df$BETRIEBSTAG)
 
 df<-df%>%filter(BETRIEBSTAG>='2020-12-15') # no data before time table change required
+df<-df%>%filter(BETRIEBSTAG<floor_date(max(df$BETRIEBSTAG),'month'))
 df<-df%>%filter(HALTESTELLEN_NAME=="Zürich HB")
 
 
@@ -49,7 +50,7 @@ df_daily_avg<-left_join(days_sequ,
 
 ### How many trains are running per period?
 df%>%group_by(yearmon)%>%summarise(count=n())
-plot(df%>%group_by(yearmon)%>%summarise(count=n()),type="l")
+plot(df%>%group_by(yearmon)%>%summarise(count=n()),type="l",ylim=c(0,255))
 
 
 ### Average delay per period
@@ -59,11 +60,17 @@ plot(avg_delay$BETRIEBSTAG,avg_delay$avg_delay, type="l")
 plot(df%>%group_by(yearmon)%>%summarise(count=n()), type="l", ylim=c(0,255))
 lines(df%>%filter(FAELLT_AUS_TF==TRUE)%>%group_by(yearmon)%>%summarise(cancelled=n()), col="red")
 
-df%>%
+df$no_na<-1
+df_completed<-df%>%complete(BETRIEBSTAG, trainNr)
+df_completed$yearmon<-as.yearmon(df_completed$BETRIEBSTAG)
+df_completed$no_na[is.na(df_completed$no_na)] <- 0
+
+
+df_completed%>%
   group_by(yearmon, trainNr)%>%
-  summarise(count=n())%>%
+  summarise(count=sum(no_na))%>%
   ggplot(aes(x=yearmon, y=count, group=trainNr,  color=trainNr))+
-  # geom_point(position=position_jitter(h=0.15,w=0.15))+
+  #geom_point(position=position_jitter(h=0.15,w=0.15))#+
   geom_line()+
   geom_point()
 
@@ -83,4 +90,7 @@ df%>%group_by(yearmon, trainNr)%>%summarise(avg_delay=mean(delay, na.rm = TRUE))
   geom_line()+
   geom_point()
 
-t<-df%>%group_by(yearmon, trainNr)%>%summarise(avg_delay=mean(delay))
+df%>%group_by(yearmon)%>%summarise(avg_delay=mean(delay, na.rm = TRUE))%>%
+  ggplot(aes(x=yearmon, y=avg_delay))+
+  geom_line()+
+  geom_point()
