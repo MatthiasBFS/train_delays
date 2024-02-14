@@ -2,7 +2,8 @@ library("tidyverse")
 library("lubridate")
 library("zoo")
 
-df<-read_csv("~/train_delays/data/raw/pt_results.csv")
+path="/train_delays/data/raw/pt_results.csv"
+df<-read_csv(paste0(getwd(), path))
 
 #### 0.Type Conversions and Wrong Encoding ####
 df$HALTESTELLEN_NAME<-gsub("Ã¼", "ü", df$HALTESTELLEN_NAME)
@@ -119,4 +120,12 @@ df_ZH%>%
   geom_point(aes(x=yearmon, y=avg_delay_ZH),color="red")+
   geom_line(aes(x=yearmon, y=avg_delay_SMA),color="green")+
   geom_point(aes(x=yearmon, y=avg_delay_SMA),color="green")
+
+
+stops = c('St. Margrethen SG', 'St. Gallen', 'Winterthur', 'Zürich Flughafen', 'Zürich HB')
+
+df%>%filter(trainNr==190)%>%filter(HALTESTELLEN_NAME %in% stops)%>%
+  ggplot()+
+  geom_point(aes(x=HALTESTELLEN_NAME, y=delay), alpha=0.1)+
+  geom_line(aes(x=HALTESTELLEN_NAME, y=delay, group=BETRIEBSTAG), alpha=0.1)
   
