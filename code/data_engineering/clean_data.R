@@ -2,8 +2,8 @@ library("tidyverse")
 library("lubridate")
 library("zoo")
 
-path="/train_delays/data/raw/pt_results.csv"
-df<-read_csv(paste0(getwd(), path))
+train_path="/train_delays/data/raw/pt_results.csv"
+df<-read_csv(paste0(getwd(), train_path))
 
 #### 0.Type Conversions and Wrong Encoding ####
 df$HALTESTELLEN_NAME<-gsub("Ã¼", "ü", df$HALTESTELLEN_NAME)
@@ -50,8 +50,44 @@ df$yearmon<-as.yearmon(df$BETRIEBSTAG)
 df<-df%>%filter(BETRIEBSTAG>='2020-12-15') # no data before time table change required
 df<-df%>%filter(BETRIEBSTAG<floor_date(max(df$BETRIEBSTAG),'month')) # keep only data for complete months (for the monthly chart)
 
+df<-df%>%filter(HALTESTELLEN_NAME=="Zürich HB")
 # to do
 # - download weather data
 # - join with weather data
 # - join with the holidays dataset
 # - save the cleaned dataset
+
+holiday_path <- "/train_delays/data/raw/holidays.csv"
+df_holidays<-read_csv(paste0(getwd(), holiday_path))
+
+#combine with holiday dataset
+df<-df%>%
+  select(c(HALTESTELLEN_NAME,BETRIEBSTAG, ANKUNFTSZEIT, AN_PROGNOSE, delay, trainNr, cancelled_SMA, yearmon))%>%
+  left_join(df_holidays, by=c("BETRIEBSTAG"="day"))
+
+#combine with addtional dataset
+additional_path <- "/train_delays/data/raw/additional_data.csv"
+df_additional<-read_csv2(paste0(getwd(), holiday_path))
+
+df_additional[1:2,]%>%transmute(day = map2(start, end, seq, by = "1 day"))%>%unnest%>%distinct
+
+df_additional$start<-dmy(df_additional$start)
+df_additional$end<-dmy(df_additional$end)
+
+
+zh_school_h<-df_additional%>%filter(city=="Zurich")%>%filter(event=="school holidays")%>%
+  transmute(day = map2(start, end, seq, by = "1 day"))%>%unnest%>%distinct
+zh_school_h$zh_school_h<-TRUE
+
+mc_school_h<-df_additional%>%filter(city=="Munich")%>%filter(event=="school holidays")%>%
+  transmute(day = map2(start, end, seq, by = "1 day"))%>%unnest%>%distinct
+mc_school_h$mc_school_h<-TRUE
+
+oktoberfest<-df_additional%>%filter(event=="oktoberfest")%>%
+  transmute(day = map2(start, end, seq, by = "1 day"))%>%unnest%>%distinct
+oktoberfest$oktoberfest<-TRUE
+
+df%>%
+  left_join(zh_school_h,  by=c("BETRIEBSTAG"="day"))%>%
+  left_join(mc_school_h,  by=c("BETRIEBSTAG"="day"))%>%
+  left_join(oktoberfest,  by=c("BETRIEBSTAG"="day"))
