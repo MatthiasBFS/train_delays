@@ -67,9 +67,8 @@ df<-df%>%
 
 #combine with addtional dataset
 additional_path <- "/train_delays/data/raw/additional_data.csv"
-df_additional<-read_csv2(paste0(getwd(), holiday_path))
+df_additional<-read_csv2(paste0(getwd(), additional_path))
 
-df_additional[1:2,]%>%transmute(day = map2(start, end, seq, by = "1 day"))%>%unnest%>%distinct
 
 df_additional$start<-dmy(df_additional$start)
 df_additional$end<-dmy(df_additional$end)
@@ -87,7 +86,12 @@ oktoberfest<-df_additional%>%filter(event=="oktoberfest")%>%
   transmute(day = map2(start, end, seq, by = "1 day"))%>%unnest%>%distinct
 oktoberfest$oktoberfest<-TRUE
 
-df%>%
+df<-df%>%
   left_join(zh_school_h,  by=c("BETRIEBSTAG"="day"))%>%
   left_join(mc_school_h,  by=c("BETRIEBSTAG"="day"))%>%
-  left_join(oktoberfest,  by=c("BETRIEBSTAG"="day"))
+  left_join(oktoberfest,  by=c("BETRIEBSTAG"="day"))%>%
+  mutate_at(c("zh_school_h","mc_school_h","oktoberfest"), ~replace_na(.,0)) 
+
+
+
+save(df, file = "train_delays/data/clean/df_clean.RData")
