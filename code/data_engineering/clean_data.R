@@ -48,5 +48,10 @@ df<-df%>%left_join(delay_SMA)
 df$yearmon<-as.yearmon(df$BETRIEBSTAG)
 
 df<-df%>%filter(BETRIEBSTAG>='2020-12-15') # no data before time table change required
-df<-df%>%filter(BETRIEBSTAG<floor_date(max(df$BETRIEBSTAG),'month'))
-df_ZH<-df%>%filter(HALTESTELLEN_NAME=="Zürich HB")
+df<-df%>%filter(BETRIEBSTAG<floor_date(max(df$BETRIEBSTAG),'month')) # keep only data for complete months (for the monthly chart)
+
+# to do
+# - download weather data
+# - join with weather data
+# - join with the holidays dataset
+# - save the cleaned dataset
