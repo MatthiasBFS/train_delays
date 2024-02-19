@@ -93,5 +93,22 @@ df<-df%>%
   mutate_at(c("zh_school_h","mc_school_h","oktoberfest"), ~replace_na(.,0)) 
 
 
+#combine with weather data
+weather_path <- "/train_delays/data/raw/weather_zurich.csv"
+df_weather<-read_csv2(paste0(getwd(), weather_path))
+
+names(df_weather)<-c("timestamp", "temp", "rain")
+df_weather$timestamp<-dmy_hm(df_weather$timestamp)
+df_weather$temp<-as.numeric(df_weather$temp)
+df_weather$rain<-as.numeric(df_weather$rain)
+df_weather$date <- date(df_weather$timestamp)
+
+df_weather_agg<-df_weather%>%
+  group_by(date)%>%
+  summarise(temp_max=max(temp),
+            temp_min=min(temp),
+            rain_sum = sum(rain))
+
+df<-df%>%left_join(df_weather_agg, by=c("BETRIEBSTAG"="date"))
 
 save(df, file = paste0(getwd(),"/train_delays/data/clean/df_clean.RData"))
