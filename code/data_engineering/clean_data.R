@@ -94,4 +94,4 @@ df<-df%>%
 
 
 
-save(df, file = "train_delays/data/clean/df_clean.RData")
+save(df, file = paste0(getwd(),"/train_delays/data/clean/df_clean.RData"))
