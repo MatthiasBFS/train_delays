@@ -22,9 +22,11 @@ df_190<-df_190%>%
       group_by(BETRIEBSTAG)%>%
       summarise(number_trains=n()))
 
+with(df_190%>%select(delay), hist(delay))
+
 #### M1 Based On Index Only ####
 
-mod1 <- gam(delay ~ s(t,bs = "ts",fx=FALSE,k=40), family=gaussian, data=df_190, na.action=na.omit)
+mod1 <- gam(delay ~ s(t,fx=FALSE,k=40), family=gaussian, data=df_190, na.action=na.omit)
 
 summary(mod1)
 plot(mod1,scale=0)
