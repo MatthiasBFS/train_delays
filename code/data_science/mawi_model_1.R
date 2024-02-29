@@ -1,9 +1,10 @@
 library(tidyverse)
 library(mgcv)
+library(broom)
 
 load("~/work/train_delays/data/clean/df_clean.RData")
 
-# Let's compute the most delayed train
+# Some Data Engineering
 df%>%group_by(trainNr)%>%summarise(sum_delay=sum(delay, na.rm=TRUE))
 
 df_190<-df%>%filter(trainNr==190)
@@ -22,20 +23,58 @@ df_190<-df_190%>%
       group_by(BETRIEBSTAG)%>%
       summarise(number_trains=n()))
 
-with(df_190%>%select(delay), hist(delay))
+# Check Data
 
-#### M1 Based On Index Only ####
+hist(df_190$delay, breaks=10)
 
-mod1 <- gam(delay ~ s(t,fx=FALSE,k=40), family=gaussian, data=df_190, na.action=na.omit)
+with(df_190%>%filter(delay<60), hist(delay))
 
-summary(mod1)
-plot(mod1,scale=0)
-plot(resid(mod1))
+summary(df_190$delay)
+sd(df_190$delay, na.rm=TRUE)
 
-predict1<-predict(mod1, df_190)
+qqnorm(df_190$delay)
+
+#### Auxiliary Functions ####
+f_collect_results <- function(df, mod){
+  output<-list(
+    deparse(substitute(mod)),
+    format(summary(mod)$formula),
+    summary(mod)$dev.expl, 
+    summary(mod)$r.sq)
+  
+  df_results<-data.frame(output)
+  colnames(df_results)<-c("model", "formula", "dev.epxl","rsq")
+  
+  
+  pred <- predict(mod, df)
+  pred <- data.frame(pred)
+  pred$mod <-deparse(substitute(mod))
+  
+  return(list(df_results, pred))
+  
+}
+
+#### M1.1 Based On Time Index Only ####
+
+mod1.1 <- gam(delay ~ s(t,fx=FALSE, k=40), family=gaussian, data=df_190, na.action=na.omit)
+
+res1.1<-f_collect_results(df_190,mod1.1)
+
+summary(mod1.1)
+plot(mod1.1,scale=0)
+plot(resid(mod1.1))
 
 plot(df_190$BETRIEBSTAG, df_190$delay, col="red")
-lines(df_190$BETRIEBSTAG, predict1)
+lines(df_190$BETRIEBSTAG, res1.1[[2]]$pred)
+
+
+#### M1.2 Based On Index Only ####
+
+mod1.2 <- gam(delay ~ s(t, fx=FALSE, k=40) + s(yday, fx=FALSE) + as.factor(month) + as.factor(wday)+number_trains, family=gaussian, data=df_190, na.action=na.omit)
+
+summary(mod1.2)
+plot(mod1.2,scale=0)
+plot(resid(mod1.2))
 
 
 #### M2 Add Year ####
